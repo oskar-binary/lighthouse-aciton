@@ -29,18 +29,20 @@ jobs:
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
-            console.log(${{steps.lighthouse_audit.outputs.manifest}})
-            const manifest = JSON.parse(${{steps.lighthouse_audit.outputs.manifest}})
+            const result = ${{steps.lighthouse_audit.outputs.manifest[0].summary}}
+            const links = ${{steps.lighthouse_audit.outputs.links}}
+            console.log(result)
+            console.log(links)
             const comment_lines = [
-                `🍿 Lighthouse report for the changes in this PR ${manifest[0].summary.performance}`,
+                `🍿 [Lighthouse report](`${Object.keys(links)[0]}`) for the changes in this PR`,
                 `
                 | Category | Score |
                     | --- | --- |
-                  | Performance | ${{steps.lighthouse_audit.outputs.manifest.summary.performance}}|
-                  | Accessibility | ${{steps.lighthouse_audit.outputs.manifest.summary.accessibility}} |
-                  | Best practices | ${{steps.lighthouse_audit.outputs.manifest.summary['best-practices']}} |
-                  | SEO | ${{steps.lighthouse_audit.outputs.manifest.summary.seo}} |
-                  | PWA | ${{steps.lighthouse_audit.outputs.manifest.summary.pwa}} |
+                  | Performance | ${result.performance}|
+                  | Accessibility | ${result.accessibility} |
+                  | Best practices | ${result['best-practices']} |
+                  | SEO | ${result.seo} |
+                  | PWA | ${result.pwa} |
                 `,
             ];
             github.issues.createComment({
