@@ -29,10 +29,10 @@ jobs:
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
-            const result = ${{steps.lighthouse_audit.outputs.manifest}}
-            // empty commen
+            const result = JSON.parse(${{steps.lighthouse_audit.outputs.manifest[0]}})
+            // empty comment
             console.log(result)
-            const links = ${{steps.lighthouse_audit.outputs.links}}
+            const links = JSON.parse(${{steps.lighthouse_audit.outputs.links}})
             console.log(links)
             const comment_lines = [
                 `🍿 [Lighthouse report](`${Object.keys(links)[0]}`) for the changes in this PR`,
