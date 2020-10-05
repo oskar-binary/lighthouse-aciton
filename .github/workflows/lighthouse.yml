@@ -5,7 +5,7 @@ on:
     types: [edited]
 
 jobs:
-  generate_app_id:
+  generate_lighthouse_audit:
     timeout-minutes: 5
     runs-on: ubuntu-latest
     steps:
@@ -14,6 +14,15 @@ jobs:
         uses: aaron-binary/vercel-preview-url-action@master
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Audit preview URL with ligthhouse
+        id: lighthouse_audit
+        uses: treosh/lighthouse-ci-action@v3
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          urls: |
+           ${{ steps.vercel_preview_url.outputs.vercel_preview_url }}
+          uploadArtifacts: true
+          temporaryPublicStorage: true
       - name: Comment on pull request with Lighthouse audit score
         id: comment_on_pr
         uses: actions/github-script@v3
@@ -22,7 +31,7 @@ jobs:
           script: |
             const comment_lines = [
                 "Hello!",
-                "",
+                "${{steps.LHCIAction.outputs.manifest.summary}}",
             ];
             github.issues.createComment({
                 issue_number: context.issue.number,
