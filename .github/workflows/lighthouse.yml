@@ -18,7 +18,6 @@ jobs:
         id: lighthouse_audit
         uses: treosh/lighthouse-ci-action@v3
         with:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           urls: |
            ${{ steps.vercel_preview_url.outputs.vercel_preview_url }}
           uploadArtifacts: true
