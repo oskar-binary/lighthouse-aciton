@@ -29,7 +29,7 @@ jobs:
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
-            const result = JSON.parse(${{steps.lighthouse_audit.outputs.manifest}}[0])
+            const result = JSON.parse(${{steps.lighthouse_audit.outputs.manifest}}[0]).summary
             // empty comment
             console.log(result)
             const links = JSON.parse(${{steps.lighthouse_audit.outputs.links}})
