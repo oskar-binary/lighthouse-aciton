@@ -31,7 +31,7 @@ jobs:
           script: |
             const comment_lines = [
                 "Hello!",
-                "${{steps.LHCIAction.outputs.manifest.summary}}",
+                "${{steps.lighthouse_audit.outputs.manifest.summary}}",
             ];
             github.issues.createComment({
                 issue_number: context.issue.number,
