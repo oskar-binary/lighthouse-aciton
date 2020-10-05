@@ -20,7 +20,7 @@ jobs:
         uses: treosh/lighthouse-ci-action@v3
         with:
           urls: |
-           ${{ steps.vercel_preview_url.outputs.vercel_preview_url }}
+            ${{ steps.vercel_preview_url.outputs.vercel_preview_url }}
           uploadArtifacts: true
           temporaryPublicStorage: true
       - name: Comment on pull request with Lighthouse audit score
@@ -30,8 +30,16 @@ jobs:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
             const comment_lines = [
-                "Hello!",
-                "${{steps.lighthouse_audit.outputs.manifest.summary}}",
+                "🍿 Lighthouse report for the changes in this PR",
+                `
+                | Category | Score |
+                    | --- | --- |
+                  | Performance | ${{steps.lighthouse_audit.outputs.manifest.summary.performance}}|
+                  | Accessibility | ${{steps.lighthouse_audit.outputs.manifest.summary.accessibility}} |
+                  | Best practices | ${{steps.lighthouse_audit.outputs.manifest.summary['best-practices']}} |
+                  | SEO | ${{steps.lighthouse_audit.outputs.manifest.summary.seo}} |
+                  | PWA | ${{steps.lighthouse_audit.outputs.manifest.summary.pwa}} |
+                `,
             ];
             github.issues.createComment({
                 issue_number: context.issue.number,
