@@ -29,8 +29,10 @@ jobs:
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
+            console.log(${{steps.lighthouse_audit.outputs.manifest}})
+            const manifest = JSON.parse(${{steps.lighthouse_audit.outputs.manifest}})
             const comment_lines = [
-                "🍿 Lighthouse report for the changes in this PR",
+                `🍿 Lighthouse report for the changes in this PR ${manifest[0].summary.performance}`,
                 `
                 | Category | Score |
                     | --- | --- |
