@@ -23,17 +23,21 @@ jobs:
             ${{ steps.vercel_preview_url.outputs.vercel_preview_url }}
           uploadArtifacts: true
           temporaryPublicStorage: true
-      - name: Comment on pull request with Lighthouse audit score
-        id: comment_on_pr
+      - name: Format lighthouse score
+        id: format_lighthouse_score
         uses: actions/github-script@v3
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
-            const result = ${{steps.lighthouse_audit.outputs.manifest}}[0].summary
-            const links = ${{steps.lighthouse_audit.outputs.links}}
+            const result = ${{ steps.lighthouse_audit.outputs.manifest }}[0].summary
+            const links = ${{ steps.lighthouse_audit.outputs.links }}
             const formatResult = (res) => res * 100
 
-            const comment_lines = [
+            // TODO: Check if comment exists --> update comment
+            // TODO: Add loading... to comment
+            // TODO: result color to column 🟢 🟠 🔴
+
+            const comment = [
                 `⚡️ [Lighthouse report](${Object.values(links)[0]}) for the changes in this PR:`,
                 '| Category | Score |',
                 '| --- | --- |',
@@ -42,11 +46,13 @@ jobs:
                 `| Best practices | ${formatResult(result['best-practices'])} |`,
                 `| SEO | ${formatResult(result.seo)} |`,
                 `| PWA | ${formatResult(result.pwa)} |`,
-            ];
+            ].join('\n')
 
-            github.issues.createComment({
-                issue_number: context.issue.number,
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                body: comment_lines.join('\n'),
-            });
+             core.setOutput("comment", comment);
+      - name: Add comment to PR
+        id: comment_to_pr
+        uses: marocchino/sticky-pull-request-comment@v1
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          header: lighthouse_audit_score
+          message:  ${{ steps.format_lighthouse_score.outputs.comment }}
