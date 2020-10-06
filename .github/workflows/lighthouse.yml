@@ -31,16 +31,17 @@ jobs:
           script: |
             const result = ${{steps.lighthouse_audit.outputs.manifest}}[0].summary
             const links = ${{steps.lighthouse_audit.outputs.links}}
+            const formatResult = (res) => res * 100
 
             const comment_lines = [
                 `⚡️ [Lighthouse report](${Object.values(links)[0]}) for the changes in this PR:`,
                 '| Category | Score |',
                 '| --- | --- |',
-                `| Performance | ${result.performance} |`,
-                `| Accessibility | ${result.accessibility} |`,
-                `| Best practices | ${result['best-practices']} |`,
-                `| SEO | ${result.seo} |`,
-                `| PWA | ${result.pwa} |`,
+                `| Performance | ${formatResult(result.performance)} |`,
+                `| Accessibility | ${formatResult(result.accessibility)} |`,
+                `| Best practices | ${formatResult(result['best-practices'])} |`,
+                `| SEO | ${formatResult(result.seo)} |`,
+                `| PWA | ${formatResult(result.pwa)} |`,
             ];
 
             github.issues.createComment({
