@@ -9,6 +9,22 @@ jobs:
     timeout-minutes: 5
     runs-on: ubuntu-latest
     steps:
+      - name: Capture PR number
+        id: capture_pr_number
+        uses: actions/github-script@v3
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+             core.setOutput("pr_number", context.issue.number)
+      - name: Add comment to PR
+        id: loading_comment_to_pr
+        uses: marocchino/sticky-pull-request-comment@v1
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          number: ${{ steps.capture_pr_number.outputs.pr_number }}
+          header: lighthouse
+          message: |
+            Running Lighthouse audit...
       - name: Capture Vercel preview URL
         id: vercel_preview_url
         uses: aaron-binary/vercel-preview-url-action@master
@@ -36,7 +52,6 @@ jobs:
             Object.keys(result).forEach(key => result[key] = formatResult(result[key]))
 
             const score = res => res >= 90 ? '🟢' : res >= 50 ? '🟠' : '🔴'
-            // TODO: Add loading... to comment
 
             const comment = [
                 `⚡️ [Lighthouse report](${Object.values(links)[0]}) for the changes in this PR:`,
@@ -51,14 +66,13 @@ jobs:
                 `*Lighthouse ran on [${Object.keys(links)[0]}](${Object.keys(links)[0]})*`
             ].join('\n')
 
-             core.setOutput("comment", comment);
-             core.setOutput("pr_number", context.issue.number)  
+             core.setOutput("comment", comment); 
       - name: Add comment to PR
         id: comment_to_pr
         uses: marocchino/sticky-pull-request-comment@v1
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          number: ${{ steps.format_lighthouse_score.outputs.pr_number }}
+          number: ${{ steps.capture_pr_number.outputs.pr_number }}
           header: lighthouse
           message: |
             ${{ steps.format_lighthouse_score.outputs.comment }}
