@@ -9,19 +9,12 @@ jobs:
     timeout-minutes: 30
     runs-on: ubuntu-latest
     steps:
-      - name: Capture PR number
-        id: capture_pr_number
-        uses: actions/github-script@v3
-        with:
-          github-token: ${{secrets.GITHUB_TOKEN}}
-          script: |
-             core.setOutput("pr_number", context.issue.number)
       - name: Add comment to PR
         id: loading_comment_to_pr
         uses: marocchino/sticky-pull-request-comment@v1
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          number: ${{ steps.capture_pr_number.outputs.pr_number }}
+          number: ${{github.event.issue.number}}
           header: lighthouse
           message: |
             Running Lighthouse audit...
@@ -72,7 +65,7 @@ jobs:
         uses: marocchino/sticky-pull-request-comment@v1
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          number: ${{ steps.capture_pr_number.outputs.pr_number }}
+          number: ${{github.event.issue.number}}
           header: lighthouse
           message: |
             ${{ steps.format_lighthouse_score.outputs.comment }}
